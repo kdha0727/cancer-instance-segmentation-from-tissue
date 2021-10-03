@@ -46,6 +46,8 @@ def train_one_epoch(model, criterion, optimizer, scheduler, train_loader, val_lo
             loss_f = loss.item()
         inner_tq.set_postfix(loss=loss_f)
 
+        print(f"\r{loss.item():.4f}   ", end='')
+
     if epoch != 0 and scheduler is not None:
         scheduler.step()
 
