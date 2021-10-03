@@ -293,7 +293,7 @@ class DecoderPath(nn.Sequential):
     forward = _forward_impl
 
 
-class UNet(nn.Sequential):
+class UNet(nn.Module):
 
     def __init__(self, n_channels, n_classes, start_filters=64, depth=5, bilinear=False):
 
@@ -305,6 +305,9 @@ class UNet(nn.Sequential):
 
         self.encoder = EncoderPath(n_channels, start_filters, depth, bilinear=bilinear, block=DoubleConv2d)
         self.decoder = DecoderPath(n_classes, start_filters, depth, bilinear=bilinear, block=DoubleConv2d)
+
+    def forward(self, x):
+        return self.decoder(self.encoder(x))
 
 
 class InceptionUNet(nn.Module):
