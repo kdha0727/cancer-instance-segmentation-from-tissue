@@ -2,11 +2,11 @@ import torch
 from tqdm.notebook import tqdm
 
 
-def train_one_epoch(model, criterion, optimizer, scheduler, train_loader, val_loader, device, epoch):
+def train_one_epoch(model, criterion, optimizer, scheduler, train_loader, val_loader, device, epoch, warmup_start=True):
 
     model.train()
 
-    if epoch == 0:  # warm_up_scheduler
+    if epoch == 0 and warmup_start:  # warm_up_scheduler
         warmup_factor = 1. / 1000
         warmup_iters = min(1000, len(train_loader) - 1)
 
