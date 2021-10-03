@@ -1,16 +1,17 @@
+# Resnet Backbone for RefineNet, but fully works.
 import torch.nn as nn
 from typing import List, Optional, Type, Union
 
 
 def conv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1, bias: bool = False) -> nn.Conv2d:
     """3x3 convolution with padding"""
-    return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
+    return nn.Conv2d(in_planes, out_planes, kernel_size=(3, 3), stride=stride,
                      padding=dilation, groups=groups, bias=bias, dilation=dilation)
 
 
 def conv1x1(in_planes: int, out_planes: int, stride: int = 1, bias: bool = False) -> nn.Conv2d:
     """1x1 convolution"""
-    return nn.Conv2d(in_planes, out_planes, kernel_size=1, stride=stride, bias=bias)
+    return nn.Conv2d(in_planes, out_planes, kernel_size=(1, 1), stride=stride, bias=bias)
 
 
 class BasicBlock(nn.Module):
@@ -110,6 +111,10 @@ class Bottleneck(nn.Module):
         return out
 
 
+class ResNetBlock(nn.Sequential):
+    pass
+
+
 class ResNet(nn.Sequential):
 
     def __init__(
@@ -118,19 +123,20 @@ class ResNet(nn.Sequential):
             layers: List[int],
             n_classes: int = 1000,
             n_channels: int = 3,
-            in_planes: int = 64,
             groups: int = 1,
             width_per_group: int = 64,
             include_top: bool = True,
+            in_planes: int = 64,
             dropout: float = 0.5,
             replace_stride_with_dilation: Optional[List[bool]] = None,
+            init_weight: bool = True,
     ) -> None:
 
         super().__init__()
 
         self.n_channels = n_channels
         self.n_classes = n_classes
-        self.in_planes = in_planes
+        self.in_planes = planes = in_planes
         self.dilation = 1
         self.groups = groups
         self.base_width = width_per_group
@@ -141,26 +147,41 @@ class ResNet(nn.Sequential):
             raise ValueError("replace_stride_with_dilation should be None or a {}-element tuple, got {}"
                              .format(len(layers) - 1, replace_stride_with_dilation))
 
-        self.conv1 = nn.Conv2d(n_channels, in_planes, kernel_size=7, stride=2, padding=3, bias=False)
-        self.bn1 = nn.BatchNorm2d(in_planes)
-        self.relu = nn.ReLU(inplace=True)
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.pre_resnet = nn.Sequential(
+            nn.Conv2d(n_channels, planes, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False),
+            nn.BatchNorm2d(planes),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
+        )
+        resnet_block = []
         for i, num_blocks in enumerate(layers):
             if not i:
-                self.add_module('layer1', self._make_layer(block, 64, num_blocks, stride=1))
+                resnet_block.append(self._make_layer(block, planes, num_blocks, stride=1))
             else:
-                self.add_module('layer{}'.format(i + 1), self._make_layer(
-                    block, 2 ** (6 + i), num_blocks, stride=2, dilate=replace_stride_with_dilation[i - 1]
+                resnet_block.append(self._make_layer(
+                    block, planes, num_blocks, stride=2, dilate=replace_stride_with_dilation[i - 1]
                 ))
-        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+            planes <<= 1
+        self.resnet_block = nn.Sequential(*resnet_block)
         if include_top:
-            self.fc = nn.Sequential(
+            self.post_resnet = nn.Sequential(
+                nn.AdaptiveAvgPool2d((1, 1)),
                 nn.Flatten(start_dim=1),
                 nn.Dropout(dropout),
                 nn.Linear(2 ** (5 + len(layers)) * block.expansion, n_classes),
             )
+        if init_weight:
+            self._init_weight()
 
-        # Weight Initialization
+    def extract_features(self, x):
+        features = []
+        x = self.pre_resnet(x)
+        for layer in self.resnet_block:
+            x = layer(x)
+            features.append(x)
+        return features
+
+    def _init_weight(self):  # Weight Initialization
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
@@ -181,7 +202,7 @@ class ResNet(nn.Sequential):
         downsample = None
         if stride != 1 or in_planes != planes * block.expansion:
             downsample = nn.Sequential(
-                nn.Conv2d(self.in_planes, planes * block.expansion, kernel_size=1, stride=stride, bias=False),
+                nn.Conv2d(self.in_planes, planes * block.expansion, kernel_size=(1, 1), stride=stride, bias=False),
                 nn.BatchNorm2d(planes * block.expansion),
             )
 
@@ -194,7 +215,7 @@ class ResNet(nn.Sequential):
         for _ in range(1, blocks):
             layers.append(block(self.in_planes, planes, dilation=self.dilation, **kwargs))
 
-        return nn.Sequential(*layers)
+        return ResNetBlock(*layers)
 
 
 def resnet18(**kwargs):

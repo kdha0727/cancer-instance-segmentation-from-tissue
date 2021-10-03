@@ -200,4 +200,5 @@ def one_hot_2d(tensor, n_classes):
 
 
 def __getattr__(name):
-    return getattr(_F, name)
+    from torch.nn import functional
+    return getattr(functional, name)

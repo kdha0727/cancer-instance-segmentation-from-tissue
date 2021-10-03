@@ -6,7 +6,7 @@ from collections import OrderedDict
 
 from typing import *
 
-from . import functional as F
+from . import functional as f
 
 
 class SkipConnection(nn.Module):
@@ -28,7 +28,7 @@ class SpectralPool2d(nn.Module):
         self.scale_factor = _pair(scale_factor)
 
     def forward(self, x):
-        return F.spectral_pool2d(x, self.scale_factor)
+        return f.spectral_pool2d(x, self.scale_factor)
 
 
 class HydPool2d(nn.Module):
