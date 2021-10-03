@@ -41,7 +41,7 @@ class BCEDiceIoUWithLogitsLoss2d(BCEDiceIoULoss2d):
     # see https://github.com/fastai/fastai/blob/master/fastai/metrics.py#L53
     def forward(self, logit, target):
         bce_input = logit.softmax(dim=-3)
-        if self.trainig:
+        if self.training:
             probability = bce_input
         else:
             probability = f.one_hot_2d(logit.argmax(dim=-3).long(), logit.size(dim=-3)).to(logit.dtype)
