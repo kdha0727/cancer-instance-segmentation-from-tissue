@@ -178,9 +178,7 @@ class UpConv(nn.Module):
         return self.conv(self.skip_conn(self.up(x), skip))
 
 
-class EncoderPath(nn.ModuleList):
-
-    __class__ = nn.ModuleList
+class EncoderPath(nn.Sequential):
 
     def __init__(
             self,
@@ -191,11 +189,11 @@ class EncoderPath(nn.ModuleList):
             hybrid_pool: bool = False,
             block: Type[Union[DoubleConv2d, Inception]] = DoubleConv2d
     ):
-        super().__init__()
         self.in_channels = in_channels
         self.start_filters = start_filters
         self.n_blocks = n_blocks
         self.bilinear = bilinear
+        layers = []
         assert n_blocks >= 2
         for i in range(1, n_blocks + 1):
             if i == 1:
@@ -206,7 +204,8 @@ class EncoderPath(nn.ModuleList):
             else:
                 layer = DownConv(in_channels, in_channels * 2, block, hybrid_pool)
                 in_channels *= 2
-            self.append(layer)
+            layers.append(layer)
+        super().__init__(*layers)
 
     def _forward_impl(self, x):
         result = OrderedDict()
@@ -220,8 +219,6 @@ class EncoderPath(nn.ModuleList):
 
 
 class InceptionEncoderPath(EncoderPath):
-
-    __class__ = nn.ModuleList
 
     def __init__(
             self,
@@ -259,9 +256,7 @@ class InceptionEncoderPath(EncoderPath):
     forward = _forward_impl
 
 
-class DecoderPath(nn.ModuleList):
-
-    __class__ = nn.ModuleList
+class DecoderPath(nn.Sequential):
 
     def __init__(
             self,
@@ -271,17 +266,18 @@ class DecoderPath(nn.ModuleList):
             bilinear: bool = False,
             block: Type[Union[DoubleConv2d, Inception]] = DoubleConv2d
     ):
-        super().__init__()
         self.bilinear = bilinear
         in_channels = start_filters * 2 ** (n_blocks - 1)
+        layers = []
         for i in range(1, n_blocks + 1):
             if i == n_blocks:
-                self.append(nn.Conv2d(in_channels, out_channels, kernel_size=(1, 1)))
+                layers.append(nn.Conv2d(in_channels, out_channels, kernel_size=(1, 1)))
             elif i == n_blocks - 1:
-                self.append(UpConv(in_channels, in_channels // 2, bilinear=bilinear, block=block))
+                layers.append(UpConv(in_channels, in_channels // 2, bilinear=bilinear, block=block))
             else:
-                self.append(UpConv(in_channels, in_channels // (4 if bilinear else 2), bilinear=bilinear, block=block))
+                layers.append(UpConv(in_channels, in_channels // (4 if bilinear else 2), bilinear=bilinear, block=block))
             in_channels //= 2
+        super().__init__(*layers)
 
     def _forward_impl(self, x):
         assert len(x) == len(self), "Input length must be same with decoder path."
@@ -297,7 +293,7 @@ class DecoderPath(nn.ModuleList):
     forward = _forward_impl
 
 
-class UNet(nn.Module):
+class UNet(nn.Sequential):
 
     def __init__(self, n_channels, n_classes, start_filters=64, depth=5, bilinear=False):
 
@@ -309,9 +305,6 @@ class UNet(nn.Module):
 
         self.encoder = EncoderPath(n_channels, start_filters, depth, bilinear=bilinear, block=DoubleConv2d)
         self.decoder = DecoderPath(n_classes, start_filters, depth, bilinear=bilinear, block=DoubleConv2d)
-
-    def forward(self, x):
-        return self.decoder(self.encoder(x))
 
 
 class InceptionUNet(nn.Module):
