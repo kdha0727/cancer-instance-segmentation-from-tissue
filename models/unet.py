@@ -160,11 +160,9 @@ class InceptionCenter(Inception):
             in_channels: int,
             out_channels: int,
             n_channels: int,
-            n_blocks: int,
     ):
         super().__init__(in_channels, out_channels)
-        sn_scale_factor = 2 ** (n_blocks - 1)
-        self.sn_pool = HydPool2d(n_channels, sn_scale_factor)
+        self.sn_pool = SwitchNorm2d(n_channels)
         self.filter = nn.Conv2d(
             out_channels * 3 + in_channels + n_channels, out_channels, kernel_size=(1, 1), padding=(0, 0)
         )
@@ -282,13 +280,14 @@ class InceptionEncoderPath(EncoderPath):
             start_filters,
             n_blocks,
             bilinear=False,
+            switch_norm=True,
             hybrid_pool=True,
             block=Inception,
             center=InceptionCenter,
     ):
         super().__init__(
             in_channels, start_filters, n_blocks,
-            bilinear=bilinear, hybrid_pool=hybrid_pool, block=block
+            bilinear=bilinear, swotch_norm=switch_norm, hybrid_pool=hybrid_pool, block=block
         )
         last_in = start_filters * 2 ** (n_blocks - 2)
         last_out = last_in * (1 if bilinear else 2)
