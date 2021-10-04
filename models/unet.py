@@ -160,9 +160,10 @@ class InceptionCenter(Inception):
             in_channels: int,
             out_channels: int,
             n_channels: int,
+            n_blocks: int,
     ):
         super().__init__(in_channels, out_channels)
-        self.sn_pool = SwitchNorm2d(n_channels)
+        self.sn_pool = HydPool2d(n_channels, n_blocks)
         self.filter = nn.Conv2d(
             out_channels * 3 + in_channels + n_channels, out_channels, kernel_size=(1, 1), padding=(0, 0)
         )
@@ -289,6 +290,7 @@ class InceptionEncoderPath(EncoderPath):
             in_channels, start_filters, n_blocks,
             bilinear=bilinear, swotch_norm=switch_norm, hybrid_pool=hybrid_pool, block=block
         )
+        self.SN = SwitchNorm2d(in_channels)
         last_in = start_filters * 2 ** (n_blocks - 2)
         last_out = last_in * (1 if bilinear else 2)
         self[-1] = DownConv.wrap_conv(
@@ -298,6 +300,7 @@ class InceptionEncoderPath(EncoderPath):
 
     def _forward_impl(self, x):
         result = OrderedDict()
+        x = self.SN(x)
         out = x
         length = len(self)
         for i, layer in enumerate(self, 1):
