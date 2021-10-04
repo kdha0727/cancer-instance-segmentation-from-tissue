@@ -1,4 +1,5 @@
 from torch.nn.modules.loss import _Loss, _WeightedLoss  # noqa
+from torch.nn import BCELoss
 from torch.nn import functional as F  # noqa
 from . import functional as f  # use as small case to be separated with torch.nn.functional
 
@@ -52,3 +53,6 @@ class BCEDiceIoUWithLogitsLoss2d(BCEDiceIoULoss2d):
 
 
 del _Loss, _WeightedLoss
+
+
+__all__ = ['BCELoss', 'DiceLoss2d', 'IoULoss2d', 'BCEDiceIoULoss2d', 'BCEDiceIoUWithLogitsLoss2d']
