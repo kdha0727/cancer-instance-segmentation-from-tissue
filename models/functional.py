@@ -10,7 +10,7 @@ _epsilon = 1e-7
 # Layers
 
 
-def _spectral_crop(x, h, w):
+def _spectral_crop_2d(x, h, w):
 
     cutoff_freq_h = math.ceil(h / 2)
     cutoff_freq_w = math.ceil(w / 2)
@@ -44,7 +44,7 @@ def _spectral_crop(x, h, w):
     return all_together
 
 
-def _spectral_pad(x, output, h, w):
+def _spectral_pad_2d(x, output, h, w):
 
     cutoff_freq_h = math.ceil(h / 2)
     cutoff_freq_w = math.ceil(w / 2)
@@ -86,7 +86,7 @@ def i_discrete_hartley_transform(x, size, *args, **kwargs):  # original signatur
     return torch.fft.irfftn(x, size, *args, **kwargs)
 
 
-class SpectralPoolingFunction(torch.autograd.Function):
+class SpectralPooling2dFunction(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx, x, height, width):  # noqa
@@ -96,7 +96,7 @@ class SpectralPoolingFunction(torch.autograd.Function):
         # Hartley transform by discrete Fourier transform
         dht = discrete_hartley_transform(x)
         # frequency cropping
-        all_together = _spectral_crop(dht, height, width)
+        all_together = _spectral_crop_2d(dht, height, width)
         # inverse Hartley transform
         dht = i_discrete_hartley_transform(all_together, all_together.size())
         return dht
@@ -107,7 +107,7 @@ class SpectralPoolingFunction(torch.autograd.Function):
         # Hartley transform by discrete Fourier transform
         dht = discrete_hartley_transform(grad_output)
         # frequency padding
-        grad_input = _spectral_pad(x, dht, ctx.oh, ctx.ow)
+        grad_input = _spectral_pad_2d(x, dht, ctx.oh, ctx.ow)
         # inverse Hartley transform
         grad_input = i_discrete_hartley_transform(grad_input, grad_input.size())
         return grad_input, None, None
@@ -119,19 +119,10 @@ def spectral_pool2d(x, scale_factor):
     else:
         scale_h = scale_w = scale_factor
     h, w = math.ceil(x.size(-2) * scale_h), math.ceil(x.size(-1) * scale_w)
-    return SpectralPoolingFunction.apply(x, h, w)
+    return SpectralPooling2dFunction.apply(x, h, w)
 
 
 # Losses
-
-
-def _assert_proper_fraction(*tensor, raise_exc=True):
-    for t in tensor:
-        if not (t.ge(0.).all() and t.le(1.).all()):
-            if raise_exc:
-                raise TypeError("Assertion failed: 0 <= tensor <= 1")
-            return False
-    return True
 
 
 def _apply_reduction(tensor, reduction):
@@ -144,36 +135,26 @@ def _apply_reduction(tensor, reduction):
     raise ValueError("Reduction expected to be None, 'mean', or 'sum', got '%s'" % reduction)
 
 
-def _dice_loss(mul, add, nd, epsilon=_epsilon):
+def _dice_loss(mul, add, nd, reduction=_default_reduction, epsilon=_epsilon):
     intersection = mul.sum(dim=tuple(range(-nd, 0, -1))) + epsilon
     union = add.sum(dim=tuple(range(-nd, 0, -1))) + epsilon * 2
     loss = 1. - (2. * intersection / union)
-    return loss
+    return _apply_reduction(loss, reduction)
 
 
-def _iou_loss(mul, add, nd, epsilon=_epsilon):
+def _iou_loss(mul, add, nd, reduction=_default_reduction, epsilon=_epsilon):
     intersection = mul.sum(dim=tuple(range(-nd, 0, -1))) + epsilon
     union = (add - mul).sum(dim=tuple(range(-nd, 0, -1))) + epsilon
     loss = 1. - (intersection / union)
-    return loss
+    return _apply_reduction(loss, reduction)
 
 
 def dice_loss_nd(output, target, nd, reduction=_default_reduction):
-    _assert_proper_fraction(output, target)
-    return _apply_reduction(_dice_loss(output * target, output + target, nd=nd), reduction)
+    return _dice_loss(output * target, output + target, nd=nd, reduction=reduction)
 
 
 def iou_loss_nd(output, target, nd, reduction=_default_reduction):
-    _assert_proper_fraction(output, target)
-    return _apply_reduction(_iou_loss(output * target, output + target, nd=nd), reduction)
-
-
-def dice_loss_2d(output, target, reduction=_default_reduction):
-    return dice_loss_nd(output, target, nd=2, reduction=reduction)
-
-
-def iou_loss_2d(output, target, reduction=_default_reduction):
-    return iou_loss_nd(output, target, nd=2, reduction=reduction)
+    return _iou_loss(output * target, output + target, nd=nd, reduction=reduction)
 
 
 # Utils
@@ -189,14 +170,6 @@ def one_hot_nd(tensor, n_classes, nd):  # N H W
     new_shape = list(range(tensor.ndim))
     new_shape.insert(-nd, tensor.ndim)
     return _F.one_hot(tensor.long(), n_classes).permute(new_shape)  # N C H W
-
-
-def convert_by_one_hot_2d(tensor):
-    return convert_by_one_hot_nd(tensor, nd=2)
-
-
-def one_hot_2d(tensor, n_classes):
-    return one_hot_nd(tensor, n_classes, nd=2)
 
 
 def __getattr__(name):
