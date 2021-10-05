@@ -372,7 +372,8 @@ class InceptionUNet(nn.Sequential):
         self.n_channels = n_channels
         self.n_classes = n_classes
         self.bilinear = bilinear
-
+        
+        self.swithnorm = SwitchNorm2d(n_channels)
         self.encoder = InceptionEncoderPath(
             n_channels, start_filters, depth, bilinear=bilinear,
             hybrid_pool=True, block=Inception, center=InceptionCenter
