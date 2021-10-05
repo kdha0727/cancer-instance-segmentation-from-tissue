@@ -1,12 +1,11 @@
 import torch
 import torch.nn as nn
-
-from torch.nn import MaxPool2d
+from torch.nn.modules.utils import _pair  # noqa
 
 from . import functional as f
 
 
-from torch.nn.modules.utils import _pair
+MaxPool2d = nn.MaxPool2d
 
 
 class SpectralPool2d(nn.Module):
@@ -33,3 +32,6 @@ class HydPool2d(nn.Module):
         spectral_pool2d = self.spectral_pool(x)
         concat_pool2d = torch.cat((max_pool2d, spectral_pool2d), dim=1)
         return self.conv1x1(concat_pool2d)
+
+
+__all__ = ['MaxPool2d', 'SpectralPool2d', 'HydPool2d']

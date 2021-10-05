@@ -365,7 +365,7 @@ class UNet(nn.Sequential):  # add simply last activation layer with `net.add_mod
 
 class InceptionUNet(nn.Sequential):
 
-    def __init__(self, n_channels, n_classes, start_filters=32, depth=5, bilinear=False):
+    def __init__(self, n_channels, n_classes, start_filters=16, depth=5, bilinear=False):
 
         super().__init__()
 
