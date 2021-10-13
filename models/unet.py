@@ -277,7 +277,7 @@ class UNet(nn.Sequential):  # add simply last activation layer with `net.add_mod
         self.n_classes = n_classes
         self.bilinear = bilinear
 
-        self.encoder = EncoderPath(n_channels, start_filters, depth, bilinear=bilinear, block=DoubleConv2d)
+        self.encoder = EncoderPath(n_channels, start_filters, depth, bilinear=bilinear, hybrid_pool=False, block=DoubleConv2d)
         self.decoder = DecoderPath(n_classes, start_filters, depth, bilinear=bilinear, block=DoubleConv2d)
 
 
