@@ -3,3 +3,5 @@ torch
 torchinfo
 torchvision~=0.9.1
 tqdm
+scikit-learn
+seaborn
