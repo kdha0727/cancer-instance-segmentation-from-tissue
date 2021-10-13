@@ -197,12 +197,16 @@ def all_together(model, dataset, device=None):
     total = correct = 0
     bce = dice = iou = 0.
     for x, true in iterator:
-        x = x.to(device).float()
-        true = true.clamp(0., 1.).to(device).float()
         if x.ndim == 4:
             size = x.size(0)
-        else:
+        elif x.ndim == 3:  # convert as batch
+            x = x.unsqueeze(0)
+            true = true.unsqueeze(0)
             size = 1
+        else:
+            raise TypeError("Invalid Input Dim")
+        x = x.to(device).float()
+        true = true.clamp(0., 1.).to(device).float()
         pred = model(x)
         bce += F.binary_cross_entropy(pred.softmax(dim=-3), true, reduction='mean').item() * size
         true_argmax = true.argmax(dim=-3).long()
