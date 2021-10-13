@@ -209,7 +209,7 @@ def all_together(model, dataset, device=None):
         pred_argmax = pred.argmax(dim=-3).long()
         logits.append(pred_argmax.view(-1))
         targets.append(true_argmax.view(-1))
-        correct += (pred_argmax == true_argmax).float().mean().item() * size
+        correct += torch.eq(pred_argmax, true_argmax).float().mean().item() * size
         pred = f.one_hot_nd(pred_argmax, pred.size(dim=-3), nd=2).to(pred.dtype)
         mul, add = pred * true, pred + true
         dice += f._dice_loss(mul, add, nd=2, reduction='mean').item() * size
