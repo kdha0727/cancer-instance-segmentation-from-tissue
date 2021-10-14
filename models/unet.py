@@ -269,7 +269,7 @@ class DecoderPath(nn.Sequential):
 
 class UNet(nn.Sequential):  # add simply last activation layer with `net.add_module('activation', nn.Sigmoid())`
 
-    def __init__(self, n_channels, n_classes, start_filters=64, depth=5, bilinear=False):
+    def __init__(self, n_channels, n_classes, start_filters=64, depth=5, bilinear=False, hybrid_pool=False):
 
         super().__init__()
 
@@ -277,13 +277,13 @@ class UNet(nn.Sequential):  # add simply last activation layer with `net.add_mod
         self.n_classes = n_classes
         self.bilinear = bilinear
 
-        self.encoder = EncoderPath(n_channels, start_filters, depth, bilinear=bilinear, hybrid_pool=False, block=DoubleConv2d)
+        self.encoder = EncoderPath(n_channels, start_filters, depth, bilinear=bilinear, hybrid_pool=hybrid_pool, block=DoubleConv2d)
         self.decoder = DecoderPath(n_classes, start_filters, depth, bilinear=bilinear, block=DoubleConv2d)
 
 
 class InceptionUNet(nn.Sequential):
 
-    def __init__(self, n_channels, n_classes, start_filters=16, depth=5, bilinear=False):
+    def __init__(self, n_channels, n_classes, start_filters=16, depth=5, bilinear=False,hybrid_pool=True):
 
         super().__init__()
 
@@ -294,6 +294,6 @@ class InceptionUNet(nn.Sequential):
         self.swithnorm = SwitchNorm2d(n_channels)
         self.encoder = InceptionEncoderPath(
             n_channels, start_filters, depth, bilinear=bilinear,
-            hybrid_pool=True, block=Inception, center=InceptionCenter
+            hybrid_pool=hybrid_pool, block=Inception, center=InceptionCenter
         )
         self.decoder = DecoderPath(n_classes, start_filters, depth, bilinear=bilinear, block=Inception)
