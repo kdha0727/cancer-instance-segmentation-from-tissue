@@ -86,7 +86,7 @@ class InceptionCenter(Inception):
         if hybrid_pool:
             self.sn_pool = HydPool2d(n_channels, sn_scale_factor)
         else:
-            self.sn_pool = nn.MaxPool2d(2)
+            self.sn_pool = nn.MaxPool2d(sn_scale_factor)
         self.filter = nn.Conv2d(
             out_channels * 3 + in_channels + n_channels, out_channels, kernel_size=(1, 1), padding=(0, 0)
         )
