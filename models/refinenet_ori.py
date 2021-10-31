@@ -4,8 +4,12 @@ import torch
 
 import numpy as np
 
-from utils.helpers import maybe_download
-from utils.layer_factory import conv1x1, conv3x3, CRPBlock, RCUBlock
+from typing import *
+
+from .resnet import BasicBlock, Bottleneck, ResNet, conv3x3, conv1x1
+
+#from utils.helpers import maybe_download
+#from utils.layer_factory import conv1x1, conv3x3, CRPBlock, RCUBlock
 
 data_info = {
     21: 'VOC',
