@@ -123,7 +123,7 @@ class RefineNet(ResNet):
             in_planes=in_planes, replace_stride_with_dilation=replace_stride_with_dilation, init_weight=False
         )
 
-#        self.do = nn.Dropout(dropout)
+        self.do = nn.Dropout(dropout)
 
         out_channels = in_planes
         refine_block = []
