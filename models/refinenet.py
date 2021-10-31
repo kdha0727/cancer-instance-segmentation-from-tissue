@@ -186,8 +186,20 @@ def rf_lw50(n_classes, **kwargs):
 
 
 def rf_lw101(n_classes, **kwargs):
-    return RefineNet(Bottleneck, [3, 4, 23, 3], n_classes=n_classes, light_weight=True, **kwargs, pretrained = True)
-
+#    return RefineNet(Bottleneck, [3, 4, 23, 3], n_classes=n_classes, light_weight=True, **kwargs, pretrained = True)
+    model = RefineNet(Bottleneck, [3, 4, 23, 3], num_classes=num_classes, **kwargs)
+    if imagenet:
+        key = '101_imagenet'
+        url = models_urls[key]
+        model.load_state_dict(maybe_download(key, url), strict=False)
+    elif pretrained:
+        dataset = data_info.get(num_classes, None)
+        if dataset:
+            bname = '101_' + dataset.lower()
+            key = 'rf' + bname
+            url = models_urls[bname]
+            model.load_state_dict(maybe_download(key, url), strict=False)
+    return model
 
 def rf_lw152(n_classes, **kwargs):
     return RefineNet(Bottleneck, [3, 8, 36, 3], n_classes=n_classes, light_weight=True, **kwargs)
