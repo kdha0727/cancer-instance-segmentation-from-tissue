@@ -55,8 +55,9 @@ class RefineBlock(nn.Module):
             top: bool = False,
             bottom: bool = False,
             light_weight: bool = False,
+            pretrained : bool = True,
     ) -> None:
-
+        
         assert not (top and bottom)
         assert bottom or out_channels
 
