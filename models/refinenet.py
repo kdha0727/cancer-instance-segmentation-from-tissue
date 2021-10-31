@@ -122,7 +122,7 @@ class RefineNet(ResNet):
         super().__init__(
             block, layers,
             include_top=False, n_channels=n_channels, groups=groups, width_per_group=width_per_group,
-            in_planes=in_planes, replace_stride_with_dilation=replace_stride_with_dilation, init_weight=False
+            in_planes=in_planes, replace_stride_with_dilation=replace_stride_with_dilation, init_weight=False, pretrained = True
         )
 
         self.do = nn.Dropout(dropout)
