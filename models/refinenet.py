@@ -33,7 +33,7 @@ class RCUBlock(nn.Sequential):
             layer = []
             for j in range(n_stages):
                 layer.append(nn.ReLU())
-                layer.append(conv3x3((out_planes if i or j else in_planes), out_planes, stride=1, bias=(not j)))
+                layer.append(conv3x3((in_planes if i or j else out_planes), out_planes, stride=1, bias=(not j)))
             layers.append(nn.Sequential(*layer))
         super().__init__(*layers)
 
