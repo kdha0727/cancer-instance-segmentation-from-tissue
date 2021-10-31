@@ -55,7 +55,7 @@ class RefineBlock(nn.Module):
             top: bool = False,
             bottom: bool = False,
             light_weight: bool = False,
-            pretrained : bool = True,
+            
     ) -> None:
         
         assert not (top and bottom)
@@ -116,6 +116,7 @@ class RefineNet(ResNet):
             min_refine_planes: int = 256,
             replace_stride_with_dilation: Optional[List[bool]] = None,
             init_weight: bool = True,
+            pretrained : bool = True,
     ) -> None:
 
         super().__init__(
