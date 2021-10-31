@@ -184,7 +184,7 @@ def rf_lw50(n_classes, **kwargs):
 
 
 def rf_lw101(n_classes, **kwargs):
-    return RefineNet(Bottleneck, [3, 4, 23, 3], n_classes=n_classes, light_weight=True, **kwargs)
+    return RefineNet(Bottleneck, [3, 4, 23, 3], n_classes=n_classes, light_weight=True, **kwargs, pretrained = True)
 
 
 def rf_lw152(n_classes, **kwargs):
