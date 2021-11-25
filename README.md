@@ -26,7 +26,7 @@ In total the dataset contains 205,343 labeled nuclei, each with an instance segm
 
 ![Preview](./assets/asset1.png)
 
-### Data Link on Kaggle
+### Origin: Kaggle
 
 * [**#1**](https://www.kaggle.com/andrewmvd/cancer-inst-segmentation-and-classification): 12.53GiB
 
@@ -38,21 +38,29 @@ In total the dataset contains 205,343 labeled nuclei, each with an instance segm
 
 ## Model Architecture
 
-**Baseline: DeepLabV3 + Resnet101**
+**DeepLabV3 + Resnet101**: Baseline
 
-* https://pytorch.org/hub/pytorch_vision_deeplabv3_resnet101/
+* **Paper**: [Arxiv 1706.05587](https://arxiv.org/abs/1706.05587)
+
+* **Implementation**: [Pytorch Vision](https://pytorch.org/hub/pytorch_vision_deeplabv3_resnet101/)
 
 **U-Net**
 
-* https://pytorch.org/hub/pytorch_vision_deeplabv3_resnet101/
+* **Paper**: [Arxiv 1505.04597](https://arxiv.org/abs/1505.04597)
+
+* **Implementation**: [models/unet.py](models/unet.py)
 
 **Inception U-Net**
 
-* https://pytorch.org/hub/pytorch_vision_deeplabv3_resnet101/
+* **Paper**: [ACM 10.1145/3376922](https://dl.acm.org/doi/abs/10.1145/3376922)
+
+* **Implementation**: [models/unet.py](models/unet.py)
 
 **RefineNet**
 
-* https://pytorch.org/hub/pytorch_vision_deeplabv3_resnet101/
+* **Paper**: [Arxiv 1611.06612](https://arxiv.org/abs/1611.06612)
+
+* **Implementation**: [models/refinenet.py](models/refinenet.py)
 
 ---
 
@@ -79,6 +87,6 @@ In total the dataset contains 205,343 labeled nuclei, each with an instance segm
 
 ## Full Source Code
 
-* [Available on Github](https://github.com/kdha0727/cancer-instance-segmentation-from-tissue/)
+* Github: [kdha0727/cancer-instance-segmentation-from-tissue]()
 
 All non-necessary codes are modularized as package. Watch all codes in github repository.
