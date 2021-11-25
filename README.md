@@ -76,9 +76,15 @@ The files within each fold directories are:
 
 **Binary Cross Entropy**
 
+![Segmentation Example](./assets/asset3.png)
+
 **Dice Coefficient**
 
+![Segmentation Example](./assets/asset4.png)
+
 **Intersection over Union**
+
+![Segmentation Example](./assets/asset5.png)
 
 ---
 
@@ -90,9 +96,6 @@ The files within each fold directories are:
 
 ### Segmentation Example
 
-![Segmentation Example](./assets/asset3.png)
-![Segmentation Example](./assets/asset4.png)
-![Segmentation Example](./assets/asset5.png)
 ![Segmentation Example](./assets/asset6.png)
 ![Segmentation Example](./assets/asset7.png)
 ![Segmentation Example](./assets/asset8.png)
@@ -100,6 +103,9 @@ The files within each fold directories are:
 ![Segmentation Example](./assets/asset10.png)
 ![Segmentation Example](./assets/asset11.png)
 ![Segmentation Example](./assets/asset12.png)
+![Segmentation Example](./assets/asset13.png)
+![Segmentation Example](./assets/asset14.png)
+![Segmentation Example](./assets/asset15.png)
 
 ---
 
