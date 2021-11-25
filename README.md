@@ -22,6 +22,16 @@ In total the dataset contains 205,343 labeled nuclei, each with an instance segm
 
 19 Tissue types (Breast, Colon, Bile-duct, Esophagus, Uterus, Lung, Cervix, Head&Neck, Skin, Adrenal Gland, Kidney, Stomach, Prostate, Testis, Liver, Thyroid, Pancreas, Ovary, Bladder). Note, that it also unifies existing datasets within it, we have carefully labelled these under a single nuclei categories schema that is common to all 19 tissues.
 
+This particular directory includes training patches of size 256x256 and their masks, this is one of the folds. In total there are more than 7 thousand training patches within all the three folds.
+
+The files within each fold directories are:
+
+* `images.npy` - image patches of 256x256
+
+* `masks.npy` an array of 6 channel instance-wise masks (0: Neoplastic cells, 1: Inflammatory, 2: Connective/Soft tissue cells, 3: Dead Cells, 4: Epithelial, 6: Background)
+
+* `types.py`  tissue type that a given path was extracted from.
+
 ### Data Preview
 
 ![Preview](./assets/asset1.png)
@@ -61,6 +71,14 @@ In total the dataset contains 205,343 labeled nuclei, each with an instance segm
 * **Paper**: [Arxiv 1611.06612](https://arxiv.org/abs/1611.06612)
 
 * **Implementation**: [models/refinenet.py](models/refinenet.py)
+
+## Metrics
+
+**Binary Cross Entropy**
+
+**Dice Coefficient**
+
+**Intersection over Union**
 
 ---
 
