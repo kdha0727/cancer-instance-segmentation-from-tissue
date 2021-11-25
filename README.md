@@ -2,10 +2,11 @@
 
 **YAI 2021 Fall Project - Medical Project Team**
 
-**Participants**
-* Dongha Kim - Yonsei Univ. College of Medicine.
-* Donggeon Bae - Yonsei. Univ. Dept. of Electrical and Electronic Engineering.
-* Junho Lee - Yonsei Univ. Dept. of Computer Engineering.
+* **[Dongha Kim](https://github.com/kdha0727)** - Yonsei Univ. College of Medicine.
+
+* **[Donggeon Bae](https://github.com/AttiBae)** - Yonsei. Univ. Dept. of Electrical and Electronic Engineering.
+
+* **[Junho Lee](https://github.com/leejunho0421)** - Yonsei Univ. Dept. of Computer Engineering.
 
 ---
 
@@ -57,11 +58,11 @@ In total the dataset contains 205,343 labeled nuclei, each with an instance segm
 
 ## Results
 
-**Confusion Matrix**
+### Confusion Matrix
 
 ![Confusion Matrix](./assets/asset2.png)
 
-**Segmentation Example**
+### Segmentation Example
 
 ![Segmentation Example](./assets/asset3.png)
 ![Segmentation Example](./assets/asset4.png)
