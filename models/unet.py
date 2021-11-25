@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from .norm import SwitchNorm2d
+from .normalization import SwitchNorm2d
 from .pooling import HydPool2d
 
 from collections import OrderedDict
@@ -301,3 +301,84 @@ class InceptionUNet(nn.Sequential):
             hybrid_pool=hybrid_pool, block=Inception, center=InceptionCenter
         )
         self.decoder = DecoderPath(n_classes, start_filters, depth, bilinear=bilinear, block=Inception)
+
+
+# class StackEncoder(nn.Module):  # inception backbone
+#
+#     def __init__(self, x_channels, y_channels):
+#         super().__init__()
+#         self.inception = Inception(x_channels, y_channels)
+#         self.pool = HydPool2d(y_channels, kernel_size=2)
+#
+#     def forward(self, x):
+#         x_conv = self.inception(x)
+#         xpool = self.pool(x_conv)
+#         return x_conv, xpool
+#
+#
+# class StackDecoder(nn.Module):
+#     def __init__(self, x_channels, y_channels):
+#         super(StackDecoder, self).__init__()
+#         self.inception = Inception(x_channels, y_channels)
+#         self.skip_conn = SkipConnection()
+#         self.upsample = nn.ConvTranspose2d(x_channels, y_channels, kernel_size=(2, 2), stride=(2, 2))
+#
+#     def forward(self, x, down_tensor):
+#         x = self.upsample(x)
+#         x = self.skip_conn(x, down_tensor)
+#         return self.inception(x)
+#
+#
+# class Center(nn.Module):
+#     def __init__(self, x_channels, y_channels):
+#         super().__init__()
+#         self.conv1x1 = ConvBnRelu2d(x_channels, y_channels, kernel_size=(1, 1), padding='same')
+#         self.conv3x3 = ConvBnRelu2d(x_channels, y_channels, kernel_size=(3, 3), padding='same')
+#         self.conv5x5 = ConvBnRelu2d(x_channels, y_channels, kernel_size=(5, 5), padding='same')
+#         self.selfconv = nn.Conv2d(y_channels * 3 + 3 + x_channels, y_channels, kernel_size=1, padding='same')
+#
+#     def forward(self, x, SNpool):
+#         x1 = self.conv1x1(x)
+#         x3 = self.conv3x3(x)
+#         x5 = self.conv5x5(x)
+#         x_cat = torch.cat((x1, x3, x5, x, SNpool), 1)
+#         x_conv = self.selfconv(x_cat)
+#         return x_conv
+#
+#
+# class InceptionUNet(nn.Module):
+#     def __init__(self, in_channels, n_classes, filters=16):
+#         super(InceptionUNet, self).__init__()
+#         self.SN = SwitchNorm2d(in_channels)
+#         self.SNpool = HydPool2d(in_channels, kernel_size=16)
+#
+#         self.down1 = StackEncoder(in_channels, filters)  ## 16
+#         self.down2 = StackEncoder(filters, filters * 2)  ## 32
+#         self.down3 = StackEncoder(filters * 2, filters * 2 * 2)  ## 64
+#         self.down4 = StackEncoder(filters * 2 * 2, filters * 2 * 2 * 2)  ## 128
+#
+#         self.center = Center(filters * 2 * 2 * 2, filters * 2 * 2 * 2 * 2)  ## 256
+#
+#         self.up4 = StackDecoder(filters * 2 * 2 * 2 * 2, filters * 2 * 2 * 2)  ## 128
+#         self.up3 = StackDecoder(filters * 2 * 2 * 2, filters * 2 * 2)  ## 64
+#         self.up2 = StackDecoder(filters * 2 * 2, filters * 2)  ## 32
+#         self.up1 = StackDecoder(filters * 2, filters)  ## 16
+#         self.classify = nn.Conv2d(filters, n_classes, kernel_size=1, bias=True)
+#
+#     def forward(self, x):
+#         x = self.SN(x)  # !!! switch norm !!!
+#         SNpool = self.SNpool(x)
+#
+#         down1, out = self.down1(x)  # 'down' for concat, 'out' for pool
+#         down2, out = self.down2(out)
+#         down3, out = self.down3(out)
+#         down4, out = self.down4(out)
+#
+#         out = self.center(out, SNpool)
+#
+#         out = self.up4(out, down4)
+#         out = self.up3(out, down3)
+#         out = self.up2(out, down2)
+#         out = self.up1(out, down1)
+#         out = self.classify(out)
+#         return out

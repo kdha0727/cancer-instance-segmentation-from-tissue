@@ -1,9 +1,14 @@
+import torch
+from torch.nn.modules.conv import _ConvNd  # noqa
+from torch.nn.modules.linear import Linear
+from torch.nn.modules.batchnorm import _NormBase  # noqa
+
+
 def weights_init(init_type='xavier'):
-    def init_fun(m):
+    def init(m):
         import math
         from torch.nn import init
-        classname = m.__class__.__name__
-        if (classname.find('Conv') == 0 or classname.find('Linear') == 0) and hasattr(m, 'weight'):
+        if isinstance(m, (_ConvNd, Linear)):
             if init_type == 'normal':
                 init.normal_(m.weight.data, 0.0, 0.02)
             elif init_type == 'xavier':
@@ -15,12 +20,10 @@ def weights_init(init_type='xavier'):
             elif init_type == 'default':
                 pass
             else:
-                assert 0, "Unsupported initialization: {}".format(init_type)
+                raise TypeError("Unsupported initialization: {}".format(init_type))
             if hasattr(m, 'bias') and m.bias is not None:
-                init.constant_(m.bias.data, 0.0)
-        elif classname.find('Norm') == 0:
-            if hasattr(m, 'weight') and m.weight is not None:
-                init.constant_(m.weight.data, 1.0)
-            if hasattr(m, 'bias') and m.bias is not None:
-                init.constant_(m.bias.data, 0.0)
-    return init_fun
+                with torch.no_grad():
+                    m.bias.data.zero_()
+        elif isinstance(m, _NormBase):
+            m.reset_parameters()
+    return init

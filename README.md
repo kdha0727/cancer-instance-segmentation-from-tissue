@@ -30,7 +30,7 @@ The files within each fold directories are:
 
 * `masks.npy` an array of 6 channel instance-wise masks (0: Neoplastic cells, 1: Inflammatory, 2: Connective/Soft tissue cells, 3: Dead Cells, 4: Epithelial, 6: Background)
 
-* `types.py`  tissue type that a given path was extracted from.
+* `types.npy`  tissue type that a given path was extracted from.
 
 ### Data Preview
 

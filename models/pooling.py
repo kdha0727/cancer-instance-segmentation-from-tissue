@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch.nn.modules.utils import _pair  # noqa
 
-from . import functional as f
+from . import functional as _f
 
 
 MaxPool2d = nn.MaxPool2d
@@ -15,7 +15,7 @@ class SpectralPool2d(nn.Module):
         self.scale_factor = _pair(scale_factor)
 
     def forward(self, x):
-        return f.spectral_pool2d(x, self.scale_factor)
+        return _f.spectral_pool2d(x, self.scale_factor)
 
 
 class HydPool2d(nn.Module):

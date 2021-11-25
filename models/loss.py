@@ -54,5 +54,3 @@ class BCEDiceIoUWithLogitsLoss2d(BCEDiceIoULoss2d):
 
 del _Loss, _WeightedLoss
 
-
-__all__ = ['BCELoss', 'DiceLoss2d', 'IoULoss2d', 'BCEDiceIoULoss2d', 'BCEDiceIoUWithLogitsLoss2d']

@@ -1,5 +1,5 @@
 from .loss import BCELoss, DiceLoss2d, IoULoss2d, BCEDiceIoULoss2d, BCEDiceIoUWithLogitsLoss2d
-from .norm import SwitchNorm2d
+from .normalization import SwitchNorm2d
 from .pooling import MaxPool2d, SpectralPool2d, HydPool2d
 
 from .init import weights_init
