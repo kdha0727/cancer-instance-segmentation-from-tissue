@@ -1,18 +1,22 @@
 # Cancer Instance Segmentation from Tissue
 
-**YAI 2021 Fall Project - Medical Project Team**
+> ***Repository*** : https://github.com/YAI-Medical/cancer-instance-segmentation-from-tissue
 
-* **[Dongha Kim](https://github.com/kdha0727)** - Yonsei Univ. College of Medicine.
+## Credits
 
-* **[Donggeon Bae](https://github.com/AttiBae)** - Yonsei. Univ. Dept. of Electrical and Electronic Engineering.
+**[YAI](https://www.instagram.com/yonsei.ai) 8th 2021 Fall Project - Medical Project Team**
 
-* **[Junho Lee](https://github.com/leejunho0421)** - Yonsei Univ. Dept. of Computer Engineering.
+* Team Leader : **[Dongha Kim](https://github.com/kdha0727)** - Yonsei Univ. College of Medicine.
+
+* Team Member : **[Donggeon Bae](https://github.com/AttiBae)** - Yonsei. Univ. Dept. of Electrical and Electronic Engineering.
+
+* Team Member : **[Junho Lee](https://github.com/leejunho0421)** - Yonsei Univ. Dept. of Computer Engineering.
 
 ---
 
 ## Dataset
 
-**Cancer Instance Segmentation and Classification Dataset**
+> ***Cancer Instance Segmentation and Classification Dataset***
 
 ### Data Description
 
@@ -74,17 +78,36 @@ The files within each fold directories are:
 
 ## Metrics
 
-**Binary Cross Entropy**
 
-![Segmentation Example](./assets/asset3.png)
+- Cost function - Hybrid Loss
 
-**Dice Coefficient**
+  $$
+  \text{Loss} = 2\times \text{BCE } + 2 \times \text{Dice } + \text{IoU}
+  $$
 
-![Segmentation Example](./assets/asset4.png)
+  1. **Binary Cross Entropy**
 
-**Intersection over Union**
+  $$
+  \text{BCE} = - \sum _{i=1} ^{\text{output size}} y_i \cdot \log {\hat{y}_i}
+  $$
 
-![Segmentation Example](./assets/asset5.png)
+  2. **Dice Coefficient**
+
+  $$
+  \text{Dice} = \frac{2\times\text{TP}}{(\text{TP} + \text{FP}) + (\text{TP} + \text{FN})}
+  $$
+
+  3. **Intersection over Union**
+
+  $$
+  \text{IoU} = \frac{\text{Dice}}{2-\text{Dice}}
+  $$
+  
+  
+- Optimizing - **Stochastic Gradient Descent with Adam**
+    - Learning Rate Scheduling - **[Cosine Annealing Warm Up Restarts](https://github.com/katsura-jp/pytorch-cosine-annealing-with-warmup/)** (See Graph Below)
+
+![Graph](https://github.com/katsura-jp/pytorch-cosine-annealing-with-warmup/raw/master/src/plot002.png)
 
 ---
 
